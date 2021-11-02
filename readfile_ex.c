@@ -1,10 +1,10 @@
-// Standard C include file for I/O functions
+// standard C include file for I/O functions
 #include <stdio.h>
 
-// Include files for libpcap functions
+// include files for libpcap functions
 #include <pcap.h>
 
-// Includes struct of ethernet, ip and tcp header
+// include struct of ethernet, ip and tcp header
 #include <netinet/if_ether.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
@@ -19,19 +19,10 @@ int main(int argc, char **argv)
 	const u_char *pkt_data;
 	u_int i=0;
 	int res;
-	char *dev = "enp1s0"; // device
+	char *dev = "enp1s0"; // device name
 	struct ether_header *eptr; // struct of ethernet header
 
-	/* live sniffing from device.
-
-       pcap_t *pcap_open_live(char *device,int snaplen, int prmisc,int to_ms,
-       char *ebuf)
-
-       snaplen - max size of packets to capture
-       promisc - set promiscous mode or not, 0 is off
-       to_ms   - time to wait in ms before timeout, do not use -1
-       errbuf  - error buffer
-	 */
+	/* live sniffing from device */
 	if ((fp = pcap_open_live(dev, BUFSIZ, 0, 10, errbuf)) == NULL)
 	{
 		printf("Error in pcap_open_live(): %s\n\n\n", errbuf);
@@ -64,13 +55,13 @@ int main(int argc, char **argv)
 			struct tcphdr *tcphead;
 
 			tcphead = (struct tcphdr *) &pkt_data[14 + ip_hl]; // jump past the ip header
-			int source_port = ntohs(tcphead->th_sport);
-			int dest_port = ntohs(tcphead->th_dport);
-			int tcp_off = ((int)tcphead->th_off)*4;
-			char *payload = (char *) &pkt_data[14 + ip_hl + tcp_off];
+			int source_port = ntohs(tcphead->th_sport); // source port
+			int dest_port = ntohs(tcphead->th_dport); // destination port
+			int tcp_off = ((int)tcphead->th_off)*4; // tcp offseat to get to payload
+			char *payload = (char *) &pkt_data[14 + ip_hl + tcp_off]; // we need to jump past both the ip and the tcp header
 
-			if (dest_port == 80) { // check if traffic is http
-				/* print timestamp and len 
+			if (dest_port == 80) {
+				/* print timestamp */
 				printf("%ld:%ld ", header->ts.tv_sec, header->ts.tv_usec);
 
 				/* print source and dest mac */
@@ -80,7 +71,7 @@ int main(int argc, char **argv)
 				eptr->ether_dhost[0], eptr->ether_dhost[1], eptr->ether_dhost[2],
 				eptr->ether_dhost[3], eptr->ether_dhost[4], eptr->ether_dhost[5]);
 
-				/* Print on screen the IP addresses of each packet, by using bit masking */
+				/* print on screen the IP addresses of each packet, by using bit masking */
 				printf("%i.%i.%i.%i --> %i.%i.%i.%i %s %i --> %i\n",
 				(source_ip & 0xff000000) >> 24, (source_ip & 0x00ff0000) >> 16, (source_ip & 0x0000ff00) >> 8, source_ip & 0x000000ff,
 				(dest_ip & 0xff000000) >> 24, (dest_ip & 0x00ff0000) >> 16, (dest_ip & 0x0000ff00) >> 8, dest_ip & 0x000000ff,
