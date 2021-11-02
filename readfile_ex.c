@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 				printf("%ld:%ld ", header->ts.tv_sec, header->ts.tv_usec);
 
 				/* print source and dest mac */
-				printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x --> %02x:%02x:%02x:%02x:%02x:%02x ",
+				printf("%02x:%02x:%02x:%02x:%02x:%02x --> %02x:%02x:%02x:%02x:%02x:%02x ",
 				eptr->ether_shost[0], eptr->ether_shost[1], eptr->ether_shost[2],
 				eptr->ether_shost[3], eptr->ether_shost[4], eptr->ether_shost[5],
 				eptr->ether_dhost[0], eptr->ether_dhost[1], eptr->ether_dhost[2],
