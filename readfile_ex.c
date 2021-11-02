@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 			int tcp_off = ((int)tcphead->th_off)*4; // tcp offseat to get to payload
 			char *payload = (char *) &pkt_data[14 + ip_hl + tcp_off]; // we need to jump past both the ip and the tcp header
 
-			if (dest_port == 80) {
+			if (dest_port == 80 || source_port == 80) {
 				/* print timestamp */
 				printf("%ld:%ld ", header->ts.tv_sec, header->ts.tv_usec);
 
@@ -80,7 +80,13 @@ int main(int argc, char **argv)
 				dest_port
 				);
 
-				printf("%s", payload); // wrong, it should print payload and not anything past it
+				struct ip* ippkt;
+				ippkt = (struct ip *) &pkt_data[14]; // this struct has the full ip length
+				int payload_len = ntohs(ippkt->ip_len) - ip_hl - tcp_off; // payload len is ip_len minus headers
+				if (payload_len > 0) {
+					payload[payload_len] = '\0'; // stop print of the payload at the end of it
+					printf("%s", payload);
+				}
 				printf("\n\n");
 			}
 
